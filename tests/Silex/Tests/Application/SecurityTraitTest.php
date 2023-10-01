@@ -41,6 +41,7 @@ class SecurityTraitTest extends TestCase
      */
     public function testIsGrantedWithoutTokenThrowsException()
     {
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException::class);
         $app = $this->createApplication();
         $app->get('/', function () { return 'foo'; });
         $app->handle(Request::create('/'));

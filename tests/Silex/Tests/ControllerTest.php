@@ -39,6 +39,7 @@ class ControllerTest extends TestCase
         $controller = new Controller(new Route('/foo'));
         $controller->bind('foo');
         $controller->freeze();
+        $this->expectException(\Silex\Exception\ControllerFrozenException::class);
         $controller->bind('bar');
     }
 
@@ -118,6 +119,7 @@ class ControllerTest extends TestCase
         $route = new MyRoute();
 
         $controller = new Controller($route);
+        $this->expectException(\BadMethodCallException::class);
         $controller->bar();
     }
 }

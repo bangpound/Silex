@@ -43,6 +43,7 @@ class SecurityServiceProviderTest extends WebTestCase
             ],
         ]);
         $app->get('/', function () {});
+        $this->expectException(\LogicException::class);
         $app->handle(Request::create('/'));
     }
 
@@ -56,7 +57,7 @@ class SecurityServiceProviderTest extends WebTestCase
         $this->assertEquals('ANONYMOUS', $client->getResponse()->getContent());
 
         $client->request('post', '/login_check', ['_username' => 'fabien', '_password' => 'bar']);
-        $this->assertContains('Bad credentials', $app['security.last_error']($client->getRequest()));
+        $this->assertStringContainsString('Bad credentials', $app['security.last_error']($client->getRequest()));
         // hack to re-close the session as the previous assertions re-opens it
         $client->getRequest()->getSession()->save();
 

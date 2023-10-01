@@ -30,13 +30,13 @@ class MonologServiceProviderTest extends TestCase
 {
     private $currErrorHandler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->currErrorHandler = set_error_handler('var_dump');
         restore_error_handler();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         set_error_handler($this->currErrorHandler);
     }
@@ -58,7 +58,7 @@ class MonologServiceProviderTest extends TestCase
         $this->assertTrue($app['monolog.handler']->hasDebug('< 200'));
 
         $records = $app['monolog.handler']->getRecords();
-        $this->assertContains('Matched route "{route}".', $records[0]['message']);
+        $this->assertStringContainsString('Matched route "{route}".', $records[0]['message']);
         $this->assertSame('GET_foo', $records[0]['context']['route']);
     }
 
@@ -183,6 +183,8 @@ class MonologServiceProviderTest extends TestCase
         $app = $this->getApplication();
         $app['monolog.level'] = 'foo';
 
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Provided logging level \'foo\' does not exist. Must be a valid monolog logging level.');
         $app['monolog.handler']->getLevel();
     }
 

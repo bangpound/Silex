@@ -31,6 +31,7 @@ class ValidatorServiceProviderTest extends TestCase
 {
     public function testRegister()
     {
+        $this->expectNotToPerformAssertions();
         $app = new Application();
         $app->register(new ValidatorServiceProvider());
         $app->register(new FormServiceProvider());
@@ -40,6 +41,7 @@ class ValidatorServiceProviderTest extends TestCase
 
     public function testRegisterWithCustomValidators()
     {
+        $this->expectNotToPerformAssertions();
         $app = new Application();
 
         $app['custom.validator'] = function () {
@@ -201,6 +203,6 @@ class ValidatorServiceProviderTest extends TestCase
         $app->register(new ValidatorServiceProvider());
         $app->register(new TranslationServiceProvider());
 
-        $this->assertInternalType('array', $app['translator.resources']);
+        $this->assertIsArray($app['translator.resources']);
     }
 }

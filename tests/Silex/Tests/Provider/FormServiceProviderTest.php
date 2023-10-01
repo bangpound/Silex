@@ -99,6 +99,8 @@ class FormServiceProviderTest extends TestCase
             return $extensions;
         });
 
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid form type. The silex service "dummy" does not exist.');
         $app['form.factory']
             ->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', [])
             ->add('dummy', 'dummy')
@@ -163,6 +165,8 @@ class FormServiceProviderTest extends TestCase
             return $extensions;
         });
 
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid form type extension. The silex service "dummy.form.type.extension" does not exist.');
         $app['form.factory']
             ->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', [])
             ->add('dummy', 'dummy.form.type')
@@ -218,6 +222,8 @@ class FormServiceProviderTest extends TestCase
             return $extensions;
         });
 
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid form type guesser. The silex service "dummy.form.type.guesser" does not exist.');
         $factory = $app['form.factory'];
     }
 
@@ -250,10 +256,10 @@ class FormServiceProviderTest extends TestCase
         $this->assertFalse($form->isValid());
         $r = new \ReflectionMethod($form, 'getErrors');
         if (!$r->getNumberOfParameters()) {
-            $this->assertContains('ERROR: German translation', $form->getErrorsAsString());
+            $this->assertStringContainsString('ERROR: German translation', $form->getErrorsAsString());
         } else {
             // as of 2.5
-            $this->assertContains('ERROR: German translation', (string) $form->getErrors(true, false));
+            $this->assertStringContainsString('ERROR: German translation', (string) $form->getErrors(true, false));
         }
     }
 

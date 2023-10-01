@@ -180,6 +180,8 @@ class ControllerCollectionTest extends TestCase
     public function testMountCallableException()
     {
         $controllers = new ControllerCollection(new Route());
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The "mount" method takes either a "ControllerCollection" instance or callable.');
         $controllers->mount('/prefix', '');
     }
 
@@ -293,6 +295,7 @@ class ControllerCollectionTest extends TestCase
         $route = new MyRoute1();
 
         $controller = new ControllerCollection($route);
+        $this->expectException(\BadMethodCallException::class);
         $controller->bar();
     }
 
