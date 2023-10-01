@@ -16,6 +16,7 @@ use Silex\Application;
 use Silex\ControllerCollection;
 use Silex\Api\ControllerProviderInterface;
 use Silex\Route;
+use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpFoundation\Response;
@@ -137,7 +138,7 @@ class ApplicationTest extends TestCase
             $app['pass'] = true;
         });
 
-        $app['dispatcher']->dispatch('test');
+        $app['dispatcher']->dispatch(new GenericEvent(), 'test');
 
         $this->assertTrue($app['pass']);
     }
