@@ -47,7 +47,7 @@ class DoctrineServiceProviderTest extends TestCase
         $this->assertArrayHasKey('memory', $params);
         $this->assertTrue($params['memory']);
         $this->assertInstanceof('Doctrine\DBAL\Driver\PDOSqlite\Driver', $db->getDriver());
-        $this->assertEquals(22, $app['db']->fetchColumn('SELECT 22'));
+        $this->assertEquals(22, $app['db']->fetchOne('SELECT 22'));
 
         $this->assertSame($app['dbs']['default'], $db);
     }
@@ -71,7 +71,7 @@ class DoctrineServiceProviderTest extends TestCase
         $this->assertArrayHasKey('memory', $params);
         $this->assertTrue($params['memory']);
         $this->assertInstanceof('Doctrine\DBAL\Driver\PDOSqlite\Driver', $db->getDriver());
-        $this->assertEquals(22, $app['db']->fetchColumn('SELECT 22'));
+        $this->assertEquals(22, $app['db']->fetchOne('SELECT 22'));
 
         $this->assertSame($app['dbs']['sqlite1'], $db);
 
@@ -95,7 +95,7 @@ class DoctrineServiceProviderTest extends TestCase
                 'sqlite1' => ['driver' => 'pdo_sqlite', 'memory' => true],
             ],
         ]);
-        $this->assertEquals(22, $app['db']->fetchColumn('SELECT 22'));
+        $this->assertEquals(22, $app['db']->fetchOne('SELECT 22'));
         $this->assertNull($app['db']->getConfiguration()->getSQLLogger());
     }
 
@@ -111,7 +111,7 @@ class DoctrineServiceProviderTest extends TestCase
                 'sqlite1' => ['driver' => 'pdo_sqlite', 'memory' => true],
             ],
         ]);
-        $this->assertEquals(22, $app['db']->fetchColumn('SELECT 22'));
+        $this->assertEquals(22, $app['db']->fetchOne('SELECT 22'));
         $this->assertNull($app['db']->getConfiguration()->getSQLLogger());
     }
 }
