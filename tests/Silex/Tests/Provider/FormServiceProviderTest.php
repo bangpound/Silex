@@ -324,9 +324,9 @@ class DummyFormType extends AbstractType
 
 class DummyFormTypeExtension extends AbstractTypeExtension
 {
-    public function getExtendedType()
+    public static function getExtendedTypes()
     {
-        return 'Symfony\Component\Form\Extension\Core\Type\FileType';
+        return ['Symfony\Component\Form\Extension\Core\Type\FileType'];
     }
 
     public function configureOptions(OptionsResolver $resolver)
