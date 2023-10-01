@@ -12,7 +12,9 @@
 namespace Silex;
 
 use Pimple\Container;
+use Pimple\Psr11\Container as Psr11Container;
 use Pimple\ServiceProviderInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -73,6 +75,10 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
         foreach ($values as $key => $value) {
             $this[$key] = $value;
         }
+
+        $this[ContainerInterface::class] = function ($app) {
+            return new Psr11Container($app);
+        };
     }
 
     /**

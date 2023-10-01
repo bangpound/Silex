@@ -13,14 +13,15 @@ namespace Silex\Provider;
 
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
+use Psr\Container\ContainerInterface;
 use Silex\Api\EventListenerProviderInterface;
-use Silex\Provider\Session\SessionListener;
-use Silex\Provider\Session\TestSessionListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpKernel\EventListener\SessionListener;
+use Symfony\Component\HttpKernel\EventListener\TestSessionListener;
 
 /**
  * Symfony HttpFoundation component Provider for sessions.
@@ -57,7 +58,7 @@ class SessionServiceProvider implements ServiceProviderInterface, EventListenerP
         };
 
         $app['session.listener'] = function ($app) {
-            return new SessionListener($app);
+            return new SessionListener($app[ContainerInterface::class]);
         };
 
         $app['session.storage.test'] = function () {
@@ -65,7 +66,7 @@ class SessionServiceProvider implements ServiceProviderInterface, EventListenerP
         };
 
         $app['session.listener.test'] = function ($app) {
-            return new TestSessionListener($app);
+            return new TestSessionListener($app[ContainerInterface::class]);
         };
 
         $app['session.storage.options'] = [];
