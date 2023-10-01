@@ -14,8 +14,8 @@ namespace Silex\Provider;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 use Silex\Api\EventListenerProviderInterface;
-use Silex\Provider\Locale\LocaleListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\EventListener\LocaleListener;
 
 /**
  * Locale Provider.
@@ -27,7 +27,7 @@ class LocaleServiceProvider implements ServiceProviderInterface, EventListenerPr
     public function register(Container $app)
     {
         $app['locale.listener'] = function ($app) {
-            return new LocaleListener($app, $app['locale'], $app['request_stack'], isset($app['request_context']) ? $app['request_context'] : null);
+            return new LocaleListener($app['request_stack'], $app['locale'], $app['request_matcher']);
         };
 
         $app['locale'] = 'en';
