@@ -17,6 +17,7 @@ use Silex\ControllerCollection;
 use Silex\Api\EventListenerProviderInterface;
 use Silex\Provider\Routing\RedirectableUrlMatcher;
 use Silex\Provider\Routing\LazyRequestMatcher;
+use Symfony\Component\HttpFoundation\UrlHelper;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\RequestContext;
@@ -60,6 +61,10 @@ class RoutingServiceProvider implements ServiceProviderInterface, EventListenerP
             $context->setHttpsPort(isset($app['request.https_port']) ? $app['request.https_port'] : 443);
 
             return $context;
+        };
+
+        $app['url_helper'] = function ($app) {
+            return new UrlHelper($app['request_stack'], $app['request_context']);
         };
 
         $app['controllers'] = function ($app) {

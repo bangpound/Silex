@@ -87,7 +87,7 @@ class TwigServiceProvider implements ServiceProviderInterface
                 $twig->addGlobal('global', $app['twig.app_variable']);
 
                 if (isset($app['request_stack'])) {
-                    $twig->addExtension(new HttpFoundationExtension($app['request_stack']));
+                    $twig->addExtension(new HttpFoundationExtension($app['url_helper']));
                     $twig->addExtension(new RoutingExtension($app['url_generator']));
                     $twig->addExtension(new WebLinkExtension($app['request_stack']));
                 }
