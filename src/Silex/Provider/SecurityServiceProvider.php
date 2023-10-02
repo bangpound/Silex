@@ -20,6 +20,7 @@ use Silex\Api\EventListenerProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestMatcher;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserChecker;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
@@ -129,7 +130,7 @@ class SecurityServiceProvider implements ServiceProviderInterface, EventListener
         };
 
         $app['security.encoder.bcrypt'] = function ($app) {
-            return new BCryptPasswordEncoder($app['security.encoder.bcrypt.cost']);
+            return new NativePasswordEncoder(null, null, $app['security.encoder.bcrypt.cost'], \PASSWORD_BCRYPT);
         };
 
         $app['security.encoder.pbkdf2'] = function ($app) {
@@ -491,7 +492,8 @@ class SecurityServiceProvider implements ServiceProviderInterface, EventListener
                     $app['security.authentication_manager'],
                     $providerKey,
                     $authenticators,
-                    $app['logger']
+                    $app['logger'],
+                    false
                 );
             };
         });
