@@ -35,7 +35,7 @@ class LogListener implements EventSubscriberInterface
     {
         $this->logger = $logger;
         if (null === $exceptionLogFilter) {
-            $exceptionLogFilter = function (\Exception $e) {
+            $exceptionLogFilter = function (\Throwable $e) {
                 if ($e instanceof HttpExceptionInterface && $e->getStatusCode() < 500) {
                     return LogLevel::ERROR;
                 }
@@ -82,7 +82,7 @@ class LogListener implements EventSubscriberInterface
      */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
-        $this->logException($event->getException());
+        $this->logException($event->getThrowable());
     }
 
     /**
@@ -114,7 +114,7 @@ class LogListener implements EventSubscriberInterface
     /**
      * Logs an exception.
      */
-    protected function logException(\Exception $e)
+    protected function logException(\Throwable $e)
     {
         $this->logger->log(call_user_func($this->exceptionLogFilter, $e), sprintf('%s: %s (uncaught exception) at %s line %s', get_class($e), $e->getMessage(), $e->getFile(), $e->getLine()), ['exception' => $e]);
     }
