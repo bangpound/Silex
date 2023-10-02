@@ -25,7 +25,7 @@ class TwigTraitTest extends TestCase
     {
         $app = $this->createApplication();
 
-        $app['twig'] = $mailer = $this->getMockBuilder('Twig_Environment')->disableOriginalConstructor()->getMock();
+        $app['twig'] = $mailer = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
         $mailer->expects($this->once())->method('render')->will($this->returnValue('foo'));
 
         $response = $app->render('view');
