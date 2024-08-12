@@ -24,8 +24,8 @@
     },
     "require-dev": {
         "doctrine/dbal": "^2.2",
-        "monolog/monolog": "^1.4.1",
         "twig/twig": "^2.0"
+        "monolog/monolog": "^3.7",
         "symfony/asset": "^7.1",
         "symfony/browser-kit": "^7.1",
         "symfony/config": "^7.1",

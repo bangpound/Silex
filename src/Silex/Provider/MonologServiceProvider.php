@@ -11,6 +11,7 @@
 
 namespace Silex\Provider;
 
+use Monolog\Level;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 use Monolog\Formatter\LineFormatter;
@@ -43,7 +44,9 @@ class MonologServiceProvider implements ServiceProviderInterface, BootableProvid
                 $app['monolog.not_found_activation_strategy'] = function () use ($app) {
                     $level = MonologServiceProvider::translateLevel($app['monolog.level']);
 
-                    return new NotFoundActivationStrategy($app['request_stack'], ['^/'], $level);
+                    $inner = new Handler\FingersCrossed\ErrorLevelActivationStrategy($level);
+
+                    return new NotFoundActivationStrategy($app['request_stack'], ['^/'], $inner);
                 };
             }
         }
@@ -130,13 +133,17 @@ class MonologServiceProvider implements ServiceProviderInterface, BootableProvid
             return $name;
         }
 
+        if ($name instanceof Level) {
+            return $name;
+        }
+
         $psrLevel = Logger::toMonologLevel($name);
 
         if (is_int($psrLevel)) {
             return $psrLevel;
         }
 
-        $levels = Logger::getLevels();
+        $levels = Level::cases();
         $upper = strtoupper($name);
 
         if (!isset($levels[$upper])) {
