@@ -15,6 +15,7 @@ use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -38,12 +39,12 @@ class ExceptionHandler implements EventSubscriberInterface
         $this->errorRenderer = $errorRenderer;
     }
 
-    public function onSilexError(GetResponseForExceptionEvent $event)
+    public function onSilexError(ExceptionEvent $event)
     {
         $exception = $event->getThrowable();
         $rendered = $this->errorRenderer->render($exception);
 
-        $response = Response::create($rendered->getAsString(), $rendered->getStatusCode(), $rendered->getHeaders())
+        $response = (new Response($rendered->getAsString(), $rendered->getStatusCode(), $rendered->getHeaders()))
             ->setCharset(ini_get('default_charset'));
 
         $event->setResponse($response);
@@ -52,7 +53,7 @@ class ExceptionHandler implements EventSubscriberInterface
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [KernelEvents::EXCEPTION => ['onSilexError', -255]];
     }

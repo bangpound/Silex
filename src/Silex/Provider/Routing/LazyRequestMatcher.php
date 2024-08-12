@@ -33,7 +33,7 @@ class LazyRequestMatcher implements RequestMatcherInterface
     /**
      * Returns the corresponding RequestMatcherInterface instance.
      *
-     * @return UrlMatcherInterface
+     * @return RequestMatcherInterface
      */
     public function getRequestMatcher()
     {
@@ -48,7 +48,7 @@ class LazyRequestMatcher implements RequestMatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function matchRequest(Request $request)
+    public function matchRequest(Request $request): array
     {
         return $this->getRequestMatcher()->matchRequest($request);
     }

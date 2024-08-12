@@ -8,14 +8,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DisableCsrfExtension extends AbstractTypeExtension
 {
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'csrf_protection' => false,
         ]);
     }
 
-    public static function getExtendedTypes()
+    public static function getExtendedTypes(): iterable
     {
         return [FormType::class];
     }

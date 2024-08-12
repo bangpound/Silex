@@ -17,11 +17,11 @@ use Pimple\ServiceProviderInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\TerminableInterface;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpFoundation\Request;
@@ -252,8 +252,8 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
     {
         $app = $this;
 
-        $this->on(KernelEvents::REQUEST, function (GetResponseEvent $event) use ($callback, $app) {
-            if (!$event->isMasterRequest()) {
+        $this->on(KernelEvents::REQUEST, function (RequestEvent $event) use ($callback, $app) {
+            if (!$event->isMainRequest()) {
                 return;
             }
 
@@ -278,8 +278,8 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
     {
         $app = $this;
 
-        $this->on(KernelEvents::RESPONSE, function (FilterResponseEvent $event) use ($callback, $app) {
-            if (!$event->isMasterRequest()) {
+        $this->on(KernelEvents::RESPONSE, function (ResponseEvent $event) use ($callback, $app) {
+            if (!$event->isMainRequest()) {
                 return;
             }
 
@@ -305,7 +305,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
     {
         $app = $this;
 
-        $this->on(KernelEvents::TERMINATE, function (PostResponseEvent $event) use ($callback, $app) {
+        $this->on(KernelEvents::TERMINATE, function (TerminateEvent $event) use ($callback, $app) {
             call_user_func($app['callback_resolver']->resolveCallback($callback), $event->getRequest(), $event->getResponse(), $app);
         }, $priority);
     }
@@ -491,7 +491,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
      * If you call this method directly instead of run(), you must call the
      * terminate() method yourself if you want the finish filters to be run.
      */
-    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
+    public function handle(Request $request, int $type = HttpKernelInterface::MAIN_REQUEST, bool $catch = true): Response
     {
         if (!$this->booted) {
             $this->boot();
@@ -505,7 +505,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
     /**
      * {@inheritdoc}
      */
-    public function terminate(Request $request, Response $response)
+    public function terminate(Request $request, Response $response): void
     {
         $this['kernel']->terminate($request, $response);
     }

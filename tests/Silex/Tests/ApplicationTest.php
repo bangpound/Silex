@@ -22,10 +22,10 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\WebLink\GenericLinkProvider;
 use Symfony\Component\WebLink\Link;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Application test cases.
@@ -423,7 +423,7 @@ class ApplicationTest extends TestCase
         ->before($middleware);
 
         $this->expectException(\RuntimeException::class);
-        $app->handle(Request::create('/'), HttpKernelInterface::MASTER_REQUEST, false);
+        $app->handle(Request::create('/'), HttpKernelInterface::MAIN_REQUEST, false);
     }
 
     /**
@@ -443,7 +443,7 @@ class ApplicationTest extends TestCase
         ->after($middleware);
 
         $this->expectException(\RuntimeException::class);
-        $app->handle(Request::create('/'), HttpKernelInterface::MASTER_REQUEST, false);
+        $app->handle(Request::create('/'), HttpKernelInterface::MAIN_REQUEST, false);
     }
 
     public function testSubRequest()

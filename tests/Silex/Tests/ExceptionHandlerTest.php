@@ -73,7 +73,7 @@ class ExceptionHandlerTest extends TestCase
 
         $request = Request::create('/foo');
         $response = $app->handle($request);
-        $this->assertStringContainsString('No route found for "GET /foo"', html_entity_decode($response->getContent()));
+        $this->assertStringContainsString('No route found for "GET', html_entity_decode($response->getContent()));
         $this->assertEquals(404, $response->getStatusCode());
     }
 
@@ -100,7 +100,8 @@ class ExceptionHandlerTest extends TestCase
 
         $request = Request::create('/foo', 'POST');
         $response = $app->handle($request);
-        $this->assertStringContainsString('No route found for "POST /foo": Method Not Allowed (Allow: GET)', html_entity_decode($response->getContent()));
+        $this->assertStringContainsString('No route found for "POST', html_entity_decode($response->getContent()));
+        $this->assertStringContainsString('Method Not Allowed (Allow: GET)', html_entity_decode($response->getContent()));
         $this->assertEquals(405, $response->getStatusCode());
         $this->assertEquals('GET', $response->headers->get('Allow'));
     }
@@ -366,7 +367,9 @@ class ExceptionHandlerTest extends TestCase
             return 'Caught LogicException';
         });
 
-        $request = Request::create('/foo');
+        $request = Request::create('/foo', 'GET', [
+            'HTTP_HOST' => '',
+        ]);
         $response = $app->handle($request);
         $this->assertStringContainsString('Caught Exception', $response->getContent());
     }

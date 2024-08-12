@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
  * Unit tests for ServiceControllerResolver, see ServiceControllerResolverRouterTest for some
  * integration tests.
  */
-class ServiceControllerResolverTest extends Testcase
+class ServiceControllerResolverTest extends TestCase
 {
     private $app;
     private $mockCallbackResolver;
@@ -46,17 +46,17 @@ class ServiceControllerResolverTest extends Testcase
             ->method('isValid')
             ->will($this->returnValue(true));
 
+        $this->app['some_service'] = function () { return new \stdClass(); };
+
         $this->mockCallbackResolver->expects($this->once())
             ->method('convertCallback')
             ->with('some_service:methodName')
-            ->will($this->returnValue(['callback']));
-
-        $this->app['some_service'] = function () { return new \stdClass(); };
+            ->willReturn($this->app->raw('some_service'));
 
         $req = Request::create('/');
         $req->attributes->set('_controller', 'some_service:methodName');
 
-        $this->assertEquals(['callback'], $this->resolver->getController($req));
+        $this->assertEquals($this->app->raw('some_service'), $this->resolver->getController($req));
     }
 
     public function testShouldUnresolvedControllerNames()
@@ -69,11 +69,14 @@ class ServiceControllerResolverTest extends Testcase
             ->with('some_class::methodName')
             ->will($this->returnValue(false));
 
-        $this->mockResolver->expects($this->once())
-            ->method('getController')
-            ->with($req)
-            ->will($this->returnValue(123));
+        $this->assertFalse($this->resolver->getController($req));
+    }
+}
 
-        $this->assertEquals(123, $this->resolver->getController($req));
+class MyServiceController
+{
+    public function index()
+    {
+        return 'bar';
     }
 }

@@ -12,16 +12,15 @@
 namespace Silex\Provider;
 
 use Pimple\Container;
+use Pimple\Psr11\ServiceLocator;
 use Pimple\ServiceProviderInterface;
-use Psr\Container\ContainerInterface;
 use Silex\Api\EventListenerProviderInterface;
+use Silex\Provider\Session\SessionFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
-use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
-use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorageFactory;
+use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorageFactory;
 use Symfony\Component\HttpKernel\EventListener\SessionListener;
-use Symfony\Component\HttpKernel\EventListener\TestSessionListener;
 
 /**
  * Symfony HttpFoundation component Provider for sessions.
@@ -35,38 +34,41 @@ class SessionServiceProvider implements ServiceProviderInterface, EventListenerP
         $app['session.test'] = false;
 
         $app['session'] = function ($app) {
-            return new Session($app['session.storage'], $app['session.attribute_bag'], $app['session.flash_bag']);
+            return $app['session.factory']->createSession();
+        };
+
+        $app['session.factory'] = function ($app) {
+            return new SessionFactory($app['request_stack'], $app['session.storage.factory'], null, $app['session.attribute_bag'], $app['session.flash_bag']);
         };
 
         $app['session.storage'] = function ($app) {
-            if ($app['session.test']) {
-                return $app['session.storage.test'];
-            }
-
-            return $app['session.storage.native'];
+            return $app['session.storage.factory']->createStorage();
         };
 
         $app['session.storage.handler'] = function ($app) {
             return new NativeFileSessionHandler($app['session.storage.save_path']);
         };
 
-        $app['session.storage.native'] = function ($app) {
-            return new NativeSessionStorage(
+        $app['session.storage.factory'] = function ($app) {
+            return $app['session.test'] ? $app['session.storage.test.factory'] : $app['session.storage.native.factory'];
+        };
+
+        $app['session.storage.native.factory'] = function ($app) {
+            return new NativeSessionStorageFactory(
                 $app['session.storage.options'],
                 $app['session.storage.handler']
             );
         };
 
+        $app['session.storage.test.factory'] = function ($app) {
+            return new MockFileSessionStorageFactory($app['session.storage.save_path']);
+        };
+
         $app['session.listener'] = function ($app) {
-            return new SessionListener($app[ContainerInterface::class]);
-        };
-
-        $app['session.storage.test'] = function () {
-            return new MockFileSessionStorage();
-        };
-
-        $app['session.listener.test'] = function ($app) {
-            return new TestSessionListener($app[ContainerInterface::class]);
+            return new SessionListener(new ServiceLocator($app, [
+                'session_factory' => 'session.factory',
+                'logger' => 'logger',
+            ]));
         };
 
         $app['session.storage.options'] = [];
@@ -78,9 +80,5 @@ class SessionServiceProvider implements ServiceProviderInterface, EventListenerP
     public function subscribe(Container $app, EventDispatcherInterface $dispatcher)
     {
         $dispatcher->addSubscriber($app['session.listener']);
-
-        if ($app['session.test']) {
-            $dispatcher->addSubscriber($app['session.listener.test']);
-        }
     }
 }

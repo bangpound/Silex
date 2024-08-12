@@ -12,7 +12,7 @@
 namespace Silex;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 /**
@@ -20,28 +20,18 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
  *
  * @author Romain Neutron <imprec@gmail.com>
  */
-class AppArgumentValueResolver implements ArgumentValueResolverInterface
+class AppArgumentValueResolver implements ValueResolverInterface
 {
-    private $app;
-
-    public function __construct(Application $app)
+    public function __construct(private Application $app)
     {
-        $this->app = $app;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supports(Request $request, ArgumentMetadata $argument)
+    public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
-        return null !== $argument->getType() && (Application::class === $argument->getType() || is_subclass_of($argument->getType(), Application::class));
-    }
+        if (null !== $argument->getType() && (Application::class === $argument->getType() || is_subclass_of($argument->getType(), Application::class))) {
+            return [$this->app];
+        }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function resolve(Request $request, ArgumentMetadata $argument)
-    {
-        yield $this->app;
+        return [];
     }
 }
