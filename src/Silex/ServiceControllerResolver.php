@@ -44,7 +44,7 @@ class ServiceControllerResolver implements ControllerResolverInterface
         $controller = $request->attributes->get('_controller', null);
 
         if (!$this->callbackResolver->isValid($controller)) {
-            return $this->controllerResolver->getController($request) || false;
+            return $this->controllerResolver->getController($request);
         }
 
         return $this->callbackResolver->convertCallback($controller);
