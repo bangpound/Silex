@@ -25,9 +25,6 @@ class ExceptionHandlerServiceProvider implements ServiceProviderInterface, Event
         };
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function subscribe(Container $app, EventDispatcherInterface $dispatcher)
     {
         if (isset($app['exception_handler'])) {

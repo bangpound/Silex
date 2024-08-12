@@ -60,9 +60,6 @@ class HttpKernelServiceProvider implements ServiceProviderInterface, EventListen
         };
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function subscribe(Container $app, EventDispatcherInterface $dispatcher)
     {
         $dispatcher->addSubscriber(new ResponseListener($app['charset']));
