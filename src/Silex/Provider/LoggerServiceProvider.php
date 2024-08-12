@@ -14,9 +14,10 @@ class LoggerServiceProvider implements ServiceProviderInterface, EventListenerPr
     public function register(Container $pimple)
     {
         $pimple['logger'] = function ($app) {
-            return new Logger($app['logger.level']);
+            return new Logger($app['logger.level'], $app['logger.output']);
         };
 
+        $pimple['logger.output'] = 'php://stderr';
         $pimple['logger.level'] = null;
 
         $pimple['logger.listener'] = function ($app) {
