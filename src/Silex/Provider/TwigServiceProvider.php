@@ -12,8 +12,8 @@
 namespace Silex\Provider;
 
 use Pimple\Container;
+use Pimple\Psr11\ServiceLocator;
 use Pimple\ServiceProviderInterface;
-use Silex\Provider\Twig\RuntimeLoader;
 use Symfony\Bridge\Twig\AppVariable;
 use Symfony\Bridge\Twig\Extension\AssetExtension;
 use Symfony\Bridge\Twig\Extension\DumpExtension;
@@ -27,11 +27,13 @@ use Symfony\Bridge\Twig\Extension\WebLinkExtension;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Bridge\Twig\Extension\HttpKernelRuntime;
 use Symfony\Component\Form\FormRenderer;
+use Symfony\Component\HttpKernel\Fragment\HIncludeFragmentRenderer;
 use Twig\Environment;
 use Twig\Extension\DebugExtension;
 use Twig\Loader\ArrayLoader;
 use Twig\Loader\ChainLoader;
 use Twig\Loader\FilesystemLoader;
+use Twig\RuntimeLoader\ContainerRuntimeLoader;
 
 /**
  * Twig integration for Silex.
@@ -61,7 +63,7 @@ class TwigServiceProvider implements ServiceProviderInterface
             // deprecated and should probably be removed in Silex 3.0
             $twig->addGlobal('app', $app);
 
-            $coreExtension = $twig->getExtension('Twig_Extension_Core');
+            $coreExtension = $twig->getExtension('Twig\Extension\CoreExtension');
 
             $coreExtension->setDateFormat($app['twig.date.format'], $app['twig.date.interval_format']);
 
@@ -106,9 +108,14 @@ class TwigServiceProvider implements ServiceProviderInterface
                 }
 
                 if (isset($app['fragment.handler'])) {
-                    $app['fragment.renderer.hinclude']->setTemplating($twig);
+                    $app['fragment.renderer.hinclude'] = function ($app) {
+                        $renderer = new HIncludeFragmentRenderer($app['twig'], $app['uri_signer'], $app['fragment.renderer.hinclude.global_template'], $app['charset']);
+                        $renderer->setFragmentPath($app['fragment.path']);
 
-                    $twig->addExtension(new HttpKernelExtension($app['fragment.handler']));
+                        return $renderer;
+                    };
+
+                    $twig->addExtension(new HttpKernelExtension());
                 }
 
                 if (isset($app['assets.packages'])) {
@@ -187,8 +194,12 @@ class TwigServiceProvider implements ServiceProviderInterface
             ];
         };
 
+        $app['twig.runtime_loader.locator'] = function ($app) {
+            return new ServiceLocator($app, $app['twig.runtimes']);
+        };
+
         $app['twig.runtime_loader'] = function ($app) {
-            return new RuntimeLoader($app, $app['twig.runtimes']);
+            return new ContainerRuntimeLoader($app['twig.runtime_loader.locator']);
         };
     }
 }
