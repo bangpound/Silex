@@ -1,5 +1,5 @@
 {
-    "name": "silex/silex",
+    "name": "bangpound/silex",
     "description": "The PHP micro-framework based on the Symfony Components",
     "keywords": ["microframework"],
     "homepage": "https://silex.symfony.com",
