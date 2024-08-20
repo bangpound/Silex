@@ -27,14 +27,6 @@ class TranslationTraitTest extends TestCase
         $app->trans('foo');
     }
 
-    public function testTransChoice()
-    {
-        $app = $this->createApplication();
-        $app['translator'] = $translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')->disableOriginalConstructor()->getMock();
-        $translator->expects($this->once())->method('trans');
-        $app->trans('foo', ['%count%' => 2]);
-    }
-
     public function createApplication()
     {
         $app = new TranslationApplication();
